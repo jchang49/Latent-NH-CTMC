@@ -1,1 +1,1 @@
-# Latent-NH-CTMC
+# Latent NH-CTMC Simulation Code
