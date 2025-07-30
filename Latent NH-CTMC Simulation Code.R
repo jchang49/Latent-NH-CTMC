@@ -226,16 +226,12 @@ if (class(fit) == 'try-error') {
     timeseq = 1:T-1; timeseq[1] = 1e-15
     s_state = X[1:T]; t_state = X[2:(T+1)]
     p_hat = rep(NA, K)
-    
     for (k in 1:K) {
       P = sweep(P_0(MLE[k,1], MLE[k,2], x, MLE[k,3], MLE[k,4], timeseq, 1), MARGIN=1, as.numeric(s_state == 0), `*`) + sweep(P_1(MLE[k,1], MLE[k,2], x, MLE[k,3], MLE[k,4], timeseq, 1), MARGIN=1, as.numeric(s_state == 1), `*`)
-      
       p_hat[k] = pi_hat[k] * prod(P[cbind(1:T, t_state+1)])
     }
-    
     Z_hat[i] = which.max(p_hat / sum(p_hat))
   }
-  
   print(Z_hat)
 }
 
