@@ -17,7 +17,7 @@ if (!require('gdata')) install.packages('gdata')
 if (!require('zoo')) install.packages('zoo')
 if (!require('parallel')) install.packages('parallel'); library(parallel)
 
-set.seed(123)
+set.seed(1)
 
 # Set up clusters for parallel optimization. 
 closeAllConnections()
