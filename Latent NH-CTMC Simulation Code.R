@@ -12,10 +12,10 @@
 rm(list = ls())
 
 # Install and load packages for simulation
-if (!require('optimParallel')) install.packages('optimParallel')
-if (!require('gdata')) install.packages('gdata')
-if (!require('zoo')) install.packages('zoo')
-if (!require('parallel')) install.packages('parallel'); library(parallel)
+if (!require('optimParallel')) install.packages('optimParallel'); library('optimParallel')
+if (!require('gdata')) install.packages('gdata'); library('gdata')
+if (!require('zoo')) install.packages('zoo'); library('zoo')
+if (!require('parallel')) install.packages('parallel'); library('parallel')
 
 set.seed(1)
 
@@ -38,7 +38,6 @@ a_3 = 2.0; b_3 = 1.0; beta01_3 = 1.5; beta10_3 = -2.0;
 p = 0.5
 # Latent class probabilities
 pi = c(0.5, 0.3, 0.2)
-
 
 ## Simulate individual trajectories from a latent NH-CTMC model
 MC = matrix(NA, 0, T + 1)
@@ -90,7 +89,6 @@ for (k in seq(K)) {
   covariate = c(covariate, covariate_each)
 }
 
-
 ## Transition Probability Functions
 P_0 = function(a, b, x, Beta01, Beta10, s, t) {
   P_00 = (log2(1+2^(x*Beta10)) * (((s+t)^b-s^b)/6 * (U(1+s^b, a, b, x, Beta01, Beta10) + U(1+(s+t)^b, a, b, x, Beta01, Beta10) + 4*U(1 + (s^b+(s+t)^b)/2, a, b, x, Beta01, Beta10))) + (1 + s^a)^(log2(1+2^(x*Beta01))) * (1 + s^b)^(log2(1+2^(x*Beta10)))) / ((1 + (s + t)^a)^log2(1+2^(x*Beta01)) * (1 + (s + t)^b)^log2(1+2^(x*Beta10)))
@@ -110,7 +108,6 @@ P_1 = function(a, b, x, Beta01, Beta10, s, t) {
 
 U = function(u, a, b, x, Beta01, Beta10){(1 + (u - 1)^(a / b))^log2(1+2^(x*Beta01)) * u^(log2(1+2^(x*Beta10)) - 1)}
 V = function(v, a, b, x, Beta01, Beta10){(1 + (v - 1)^(b / a))^log2(1+2^(x*Beta10)) * v^(log2(1+2^(x*Beta01)) - 1)}
-
 
 ## Negative log-likelihood function 
 nLL = function(par, MC, covariate, n_cluster) {
@@ -179,12 +176,9 @@ phi_0 = log(pi_0 / (1 - sum(pi_0[-K])))[-K]
 
 par0 = unmatrix(cbind(m1, matrix(0, K, 2), c(phi_0, NA)), byrow=TRUE)[-n_var*K]
 
-
 ## Perform optimization
 clusterExport(cl, c('P_0', 'P_1', 'U', 'V', 'T', 'MC', 'covariate'))
-
 fit = try(optimParallel(par=par0, fn=nLL, lower=c(rep(c(0, 0, rep(-Inf, 2+1)), K))[-n_var*K], MC=MC, covariate=covariate, n_cluster=K, control=list(maxit=1000),  method='L-BFGS-B', hessian=TRUE))
-
 stopCluster(cl)
 
 # Optimize with Nelder-Mead if convergence fails. 
@@ -196,7 +190,6 @@ if (class(fit) == 'try-error') {
   
   fit = try(constrOptim(theta=par0, f=nLL, MC=MC, covariate=covariate, n_cluster=K, ui=UI, ci=CI, control=list(maxit=1000), method='Nelder-Mead'))
 }
-
 
 if (class(fit) == 'try-error') {
   cat('Optimization procedures failed.')
@@ -217,7 +210,6 @@ if (class(fit) == 'try-error') {
   print(pi_hat)
   print(pi)
   
-  
   ## Predict latent classes
   Z_hat = rep(NA, N)
   
@@ -234,4 +226,3 @@ if (class(fit) == 'try-error') {
   }
   print(Z_hat)
 }
-
